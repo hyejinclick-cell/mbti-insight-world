@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI Insight World - 맞춤형 라이프스타일 큐레이션</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .7; }
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Lucide Icons (Simple SVG Components)
+        const Search = ({ size = 24, className = "" }) => (
+            <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+        );
+
+        const ArrowLeft = ({ size = 24, className = "" }) => (
+            <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        );
+
+        const MBTIInsightWorld = () => {
+            const [selectedMBTI, setSelectedMBTI] = useState(null);
+            const [searchQuery, setSearchQuery] = useState('');
+
+            const mbtiData = {
+                INTJ: {
+                    type: 'INTJ',
+                    nickname: '전략가',
+                    color: 'from-purple-600 to-indigo-700',
+                    bgColor: 'bg-purple-50',
+                    borderColor: 'border-purple-300',
+                    summary: '독립적이고 분석적인 전략적 사고가',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '교토, 일본 - 조용한 사찰과 정원에서 깊은 사색을 즐기며, 체계적으로 계획된 문화 탐방이 가능합니다. 혼자만의 시간을 가지며 역사와 철학을 탐구할 수 있는 완벽한 장소입니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '스위스 - 효율적인 시스템, 높은 생활 수준, 개인 프라이버시 존중 문화가 완벽하게 조화를 이룹니다. 정확성과 계획성을 중시하는 문화가 INTJ와 잘 맞습니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '지적 대화에서 사랑을 느낍니다. 겉으로는 차가워 보이지만, 깊은 신뢰가 쌓이면 헌신적입니다. 파트너의 성장을 함께 계획하고 장기적 관계를 지향합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '시스템 아키텍트, 전략 컨설턴트, 연구원, 투자 분석가 - 복잡한 문제를 체계적으로 해결하고 장기적 비전을 설계하는 역할에서 탁월합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ENTP - 지적 토론과 새로운 아이디어 교환으로 서로를 자극합니다. ENFP - 따뜻함으로 INTJ의 차가운 면을 녹이며 균형을 맞춥니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '감정 표현이 서툴고 완벽주의 성향이 강합니다. 타인의 감정을 이해하려는 노력과 "완벽하지 않아도 괜찮다"는 마인드셋이 필요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '혼자만의 공간에서 독서하거나 복잡한 퍼즐, 전략 게임을 즐깁니다. 장기적 프로젝트를 계획하며 통제감을 회복합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Notion - 모든 것을 체계적으로 정리하고 계획하며, 효율성을 극대화하는 완벽한 시스템 그 자체입니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '셜록 홈즈 (셜록) - 뛰어난 분석력과 전략적 사고, 감정보다 논리를 우선시하는 천재 탐정의 모습과 닮았습니다.'
+                    }
+                },
+                INTP: {
+                    type: 'INTP',
+                    nickname: '논리술사',
+                    color: 'from-purple-500 to-violet-600',
+                    bgColor: 'bg-purple-50',
+                    borderColor: 'border-purple-300',
+                    summary: '호기심 많은 이론가이자 혁신적 사고가',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '케임브리지, 영국 - 역사적인 대학 도시에서 학문적 분위기를 만끽하며, 고서점과 박물관을 자유롭게 탐험할 수 있습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '네덜란드 - 개방적인 사고방식, 혁신적인 기술 환경, 개인주의를 존중하는 문화가 INTP의 창의성을 꽃피우게 합니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '독특한 관점과 깊은 대화에 끌립니다. 감정 표현은 서툴지만 상대를 이해하려는 노력을 계속합니다. 자유로운 관계를 선호합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '소프트웨어 개발자, 물리학자, 철학자, 데이터 과학자 - 추상적 개념을 다루고 복잡한 이론을 탐구하는 분야에서 빛을 발합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ENTJ - 논리적 대화로 서로를 자극하며 목표 달성을 돕습니다. INFJ - 깊이 있는 철학적 대화로 정서적 안정을 제공합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '실행력이 부족하고 현실 감각이 약합니다. 작은 목표부터 실천하고, 아이디어를 구체화하는 연습이 필요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '흥미로운 주제에 대해 깊이 파고들거나, 복잡한 문제를 혼자 해결하며 머릿속을 정리합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Wikipedia - 끝없는 호기심으로 모든 지식을 탐구하고, 한 주제에서 다른 주제로 끝없이 연결됩니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '브루스 배너 (어벤져스) - 천재적인 과학자이자 이론가로, 복잡한 문제를 논리적으로 풀어내는 모습이 닮았습니다.'
+                    }
+                },
+                ENTJ: {
+                    type: 'ENTJ',
+                    nickname: '통솔자',
+                    color: 'from-purple-700 to-pink-600',
+                    bgColor: 'bg-purple-50',
+                    borderColor: 'border-purple-300',
+                    summary: '카리스마 넘치는 리더이자 목표 지향적 실행가',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '뉴욕, 미국 - 빠르게 움직이는 도시 에너지와 비즈니스 기회가 넘치는 곳. 효율적으로 많은 것을 경험하며 영감을 받을 수 있습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '싱가포르 - 효율성, 경쟁력, 비즈니스 친화적 환경이 완벽하게 갖춰진 나라. 성과 중심 문화가 ENTJ와 잘 맞습니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '목표 의식이 뚜렷하고 자신감 있는 사람에게 끌립니다. 관계도 전략적으로 발전시키며, 파트너와 함께 성장하길 원합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: 'CEO, 경영 컨설턴트, 변호사, 정치인 - 조직을 이끌고 큰 그림을 그리며 목표를 달성하는 리더십 역할에서 탁월합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'INTP - 창의적 아이디어로 ENTJ의 비전을 풍부하게 만듭니다. INFP - 따뜻함과 공감으로 ENTJ의 강한 면을 부드럽게 합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '타인의 감정에 둔감하고 지나치게 지배적일 수 있습니다. 경청하는 연습과 타인의 페이스를 존중하는 것이 중요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '고강도 운동이나 새로운 도전 과제를 통해 에너지를 발산합니다. 목표를 재설정하며 통제감을 회복합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'LinkedIn - 네트워킹, 목표 달성, 커리어 성장에 집중하며 끊임없이 앞으로 나아갑니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '미란다 프리슬리 (악마는 프라다를 입는다) - 강력한 리더십과 완벽주의, 목표 지향적인 모습이 닮았습니다.'
+                    }
+                },
+                ENTP: {
+                    type: 'ENTP',
+                    nickname: '발명가',
+                    color: 'from-violet-600 to-purple-500',
+                    bgColor: 'bg-purple-50',
+                    borderColor: 'border-purple-300',
+                    summary: '창의적이고 논쟁을 즐기는 혁신가',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '베를린, 독일 - 다양한 문화가 공존하고 혁신적인 스타트업 문화가 살아있는 도시. 예술과 기술이 만나는 곳에서 영감을 받습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '캐나다 - 다양성을 존중하고 혁신적인 아이디어를 환영하는 문화. 자유로운 사고와 토론이 활발한 환경입니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '지적 자극과 유머가 있는 사람에게 끌립니다. 논쟁을 사랑의 표현으로 여기며, 자유롭고 역동적인 관계를 추구합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '스타트업 창업가, 마케팅 전략가, 변호사, 발명가 - 새로운 아이디어를 실험하고 창의적 문제 해결이 필요한 분야에서 빛납니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'INFJ - 깊이 있는 통찰로 ENTP의 아이디어에 의미를 더합니다. INTJ - 전략적 사고로 ENTP의 창의성을 실현 가능하게 만듭니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '집중력이 부족하고 루틴을 싫어합니다. 우선순위를 정하고 하나의 프로젝트를 끝까지 완수하는 연습이 필요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '새로운 사람들과 토론하거나 완전히 새로운 프로젝트를 시작하며 에너지를 재충전합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Reddit - 다양한 주제에 대해 토론하고 논쟁하며, 끝없이 새로운 아이디어를 탐구합니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '토니 스타크 (아이언맨) - 천재적 발명가이자 위트 넘치는 혁신가로, 끊임없이 도전하는 모습이 닮았습니다.'
+                    }
+                },
+                INFJ: {
+                    type: 'INFJ',
+                    nickname: '옹호자',
+                    color: 'from-emerald-600 to-teal-700',
+                    bgColor: 'bg-emerald-50',
+                    borderColor: 'border-emerald-300',
+                    summary: '깊은 통찰력을 지닌 이상주의적 조력자',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '산토리니, 그리스 - 고요한 아름다움 속에서 깊은 성찰을 하며, 의미 있는 순간들을 만들 수 있는 영혼의 휴식처입니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '노르웨이 - 사회 복지가 잘 갖춰지고 개인의 가치를 존중하는 문화. 자연과 조화로운 삶을 추구할 수 있습니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '깊은 정서적 연결과 진정성에 끌립니다. 소울메이트를 찾길 원하며, 한 번 사랑하면 헌신적이고 이해심 깊은 파트너가 됩니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '심리상담사, 작가, 사회운동가, 교육자 - 사람들에게 깊은 영향을 미치고 세상을 더 나은 곳으로 만드는 일에서 보람을 느낍니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ENTP - 지적 자극과 새로운 관점을 제공합니다. ENFP - 열정과 따뜻함으로 INFJ의 이상을 현실로 만듭니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '타인의 문제를 과도하게 떠안고 번아웃을 경험합니다. 건강한 경계를 설정하고 자신을 먼저 돌보는 것이 중요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '혼자만의 시간에 일기를 쓰거나 명상하며 내면의 평화를 되찾습니다. 자연 속 산책도 큰 위안이 됩니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Calm - 깊은 명상과 내면의 평화를 추구하며, 사람들의 마음을 치유합니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '간달프 (반지의 제왕) - 지혜롭고 통찰력 있는 조언자로, 세상을 더 나은 곳으로 만들려는 모습이 닮았습니다.'
+                    }
+                },
+                INFP: {
+                    type: 'INFP',
+                    nickname: '중재자',
+                    color: 'from-teal-600 to-cyan-600',
+                    bgColor: 'bg-teal-50',
+                    borderColor: 'border-teal-300',
+                    summary: '이상주의적이고 감수성 풍부한 몽상가',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '아이슬란드 - 신비로운 자연 경관 속에서 영감을 받으며, 혼자만의 시간으로 내면을 탐험할 수 있는 마법 같은 곳입니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '뉴질랜드 - 평화로운 자연 환경과 여유로운 삶의 속도, 창의성을 존중하는 문화가 INFP의 영혼을 편안하게 합니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '진정성 있고 깊은 감정 교류에 끌립니다. 로맨틱하고 헌신적이며, 파트너의 꿈을 함께 응원하는 지지자가 됩니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '작가, 예술가, 상담사, 사회복지사 - 창의성을 발휘하고 사람들에게 의미 있는 영향을 미칠 수 있는 분야에서 행복을 느낍니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ENFJ - 따뜻한 리더십으로 INFP의 잠재력을 끌어냅니다. ENTJ - 실행력으로 INFP의 이상을 현실로 만듭니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '현실을 회피하고 지나치게 이상적입니다. 작은 실천부터 시작하고, 불완전함을 받아들이는 연습이 필요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '글쓰기, 그림 그리기 등 창작 활동으로 감정을 표현하거나, 좋아하는 음악을 들으며 몽상에 빠집니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Pinterest - 아름다운 이미지와 영감을 수집하며, 이상적인 세계를 꿈꿉니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '어멜리 풀랭 (아멜리에) - 순수하고 로맨틱한 몽상가로, 작은 것에서 아름다움을 발견하는 모습이 닮았습니다.'
+                    }
+                },
+                ENFJ: {
+                    type: 'ENFJ',
+                    nickname: '선도자',
+                    color: 'from-green-600 to-emerald-600',
+                    bgColor: 'bg-green-50',
+                    borderColor: 'border-green-300',
+                    summary: '카리스마 넘치고 사람들에게 영감을 주는 리더',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '바르셀로나, 스페인 - 활기찬 문화와 예술이 넘치는 도시에서 사람들과 교류하며 새로운 에너지를 얻을 수 있습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '덴마크 - 공동체 의식이 강하고 사회적 연대를 중시하는 문화. 사람들과 함께 성장하며 행복을 추구할 수 있습니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '따뜻하고 헌신적이며 파트너의 성장을 진심으로 응원합니다. 감정 표현이 풍부하고 관계에 많은 에너지를 투자합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '교사, HR 매니저, 코치, 정치인 - 사람들을 이끌고 동기를 부여하며 긍정적인 변화를 만드는 역할에서 탁월합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'INFP - 깊은 감수성으로 ENFJ의 따뜻함을 이해합니다. ISTP - 현실적 관점으로 ENFJ에게 균형을 제공합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '타인의 인정에 지나치게 의존하고 자신을 희생합니다. 자신의 욕구를 표현하고 거절하는 법을 배워야 합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '친한 친구들과 깊은 대화를 나누거나, 봉사 활동을 통해 다른 사람을 돕며 에너지를 회복합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Instagram - 사람들과 소통하고 영감을 주며, 긍정적인 영향력을 전파합니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '톰 행크스 (캐스트 어웨이) - 따뜻하고 카리스마 있는 리더로, 사람들에게 희망을 주는 모습이 닮았습니다.'
+                    }
+                },
+                ENFP: {
+                    type: 'ENFP',
+                    nickname: '활동가',
+                    color: 'from-lime-600 to-green-600',
+                    bgColor: 'bg-lime-50',
+                    borderColor: 'border-lime-300',
+                    summary: '열정적이고 창의적인 자유로운 영혼',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '발리, 인도네시아 - 자유로운 분위기와 영적 에너지가 넘치는 곳. 새로운 사람들을 만나고 모험을 즐기며 영감을 받습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '호주 - 개방적이고 모험적인 문화, 다양한 기회와 자유로운 라이프스타일이 ENFP의 열정을 불태웁니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '열정적이고 로맨틱하며 파트너에게 끊임없는 서프라이즈를 선사합니다. 깊은 감정 교류와 새로운 경험을 함께 추구합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '크리에이티브 디렉터, 저널리스트, 이벤트 플래너, 심리학자 - 창의성과 사람들과의 교류가 필요한 역동적인 분야에서 빛납니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'INTJ - 전략적 사고로 ENFP의 아이디어를 구체화합니다. INFJ - 깊은 통찰로 ENFP에게 의미와 방향을 제시합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '집중력이 부족하고 쉽게 지루해합니다. 우선순위를 정하고 한 가지 일을 끝까지 완수하는 연습이 필요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '친구들과 즉흥적인 모험을 떠나거나, 새로운 취미를 시작하며 에너지를 재충전합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'TikTok - 창의적이고 즉흥적이며, 끊임없이 새로운 아이디어와 트렌드를 만들어냅니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '필 던피 (모던 패밀리) - 열정적이고 낙관적이며, 끊임없이 새로운 아이디어로 주변을 즐겁게 하는 모습이 닮았습니다.'
+                    }
+                },
+                ISTJ: {
+                    type: 'ISTJ',
+                    nickname: '현실주의자',
+                    color: 'from-blue-700 to-indigo-700',
+                    bgColor: 'bg-blue-50',
+                    borderColor: 'border-blue-300',
+                    summary: '책임감 강하고 체계적인 실용주의자',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '비엔나, 오스트리아 - 질서정연한 도시 구조와 풍부한 역사, 체계적인 문화 체험이 가능한 완벽한 여행지입니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '독일 - 규칙을 중시하고 효율적인 시스템, 안정적인 사회 구조가 ISTJ의 가치관과 완벽하게 맞아떨어집니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '진지하고 헌신적이며 말보다 행동으로 사랑을 표현합니다. 안정적이고 예측 가능한 관계를 선호하며 약속을 지킵니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '회계사, 감사관, 프로젝트 매니저, 공무원 - 세밀함과 책임감이 필요한 체계적인 업무에서 탁월한 능력을 발휘합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ESFP - 자발성으로 ISTJ의 삶에 재미를 더합니다. ENFP - 창의성으로 새로운 관점을 제공합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '변화에 저항하고 융통성이 부족합니다. 새로운 경험을 작은 단계로 시도하고, 다른 방식도 인정하는 연습이 필요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '일상 루틴을 유지하며 정리정돈을 하거나, 계획대로 진행되는 활동을 통해 안정감을 되찾습니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Google Calendar - 모든 일정을 완벽하게 관리하고, 계획대로 실행하는 신뢰할 수 있는 시스템입니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '허미온느 그레인저 (해리포터) - 책임감 있고 규칙을 중시하며, 체계적으로 문제를 해결하는 모습이 닮았습니다.'
+                    }
+                },
+                ISFJ: {
+                    type: 'ISFJ',
+                    nickname: '수호자',
+                    color: 'from-sky-600 to-blue-600',
+                    bgColor: 'bg-sky-50',
+                    borderColor: 'border-sky-300',
+                    summary: '따뜻하고 헌신적인 보살핌의 달인',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '교토, 일본 - 전통과 예의를 중시하는 문화 속에서 평온함을 느끼며, 세심한 배려가 돋보이는 여행을 즐길 수 있습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '일본 - 예의와 배려를 중시하는 문화, 안정적인 사회 시스템이 ISFJ의 성향과 잘 맞습니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '헌신적이고 세심하게 파트너를 돌봅니다. 작은 것 하나까지 기억하며 사랑을 실천하고, 안정적인 관계를 추구합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '간호사, 초등교사, 사서, 행정 담당자 - 사람들을 돕고 세심한 관리가 필요한 분야에서 보람을 느낍니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ESTP - 활동적인 에너지로 ISFJ에게 새로운 경험을 선사합니다. ESFP - 즐거움으로 ISFJ의 삶을 밝게 만듭니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '자신의 욕구를 무시하고 타인을 우선시합니다. 자기 자신도 소중히 여기고, 거절하는 법을 배워야 합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '집안 정리나 요리 같은 익숙한 활동으로 마음을 안정시키고, 가까운 사람과 조용히 시간을 보냅니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Reminders - 모든 것을 잊지 않고 챙기며, 다른 사람들을 위해 항상 준비되어 있습니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '사만다 (그녀) - 헌신적이고 세심하게 상대를 이해하고 돌보는 모습이 닮았습니다.'
+                    }
+                },
+                ESTJ: {
+                    type: 'ESTJ',
+                    nickname: '경영자',
+                    color: 'from-blue-600 to-cyan-600',
+                    bgColor: 'bg-blue-50',
+                    borderColor: 'border-blue-300',
+                    summary: '실용적이고 조직적인 관리의 달인',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '런던, 영국 - 전통과 질서가 살아있는 도시에서 효율적으로 계획된 관광을 즐기며, 역사적 명소를 체계적으로 탐방합니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '미국 - 성과 중심 문화와 명확한 규칙, 실용주의적 접근이 ESTJ의 가치관과 잘 맞습니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '책임감 있고 신뢰할 수 있는 파트너입니다. 감정 표현은 서툴지만 실질적인 행동으로 사랑을 증명합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '관리자, 경영 컨설턴트, 은행원, 군인 - 조직을 효율적으로 운영하고 명확한 규칙을 적용하는 역할에서 탁월합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ISFP - 감수성으로 ESTJ의 강한 면을 부드럽게 합니다. INTP - 창의적 관점으로 새로운 해결책을 제시합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '지나치게 고집스럽고 융통성이 부족합니다. 다른 사람의 의견을 경청하고, 감정도 중요하다는 것을 인정해야 합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '운동이나 정리정돈으로 통제감을 회복하고, 체계적인 계획을 세우며 안정을 되찾습니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Trello - 모든 프로젝트를 효율적으로 관리하고, 체계적으로 목표를 달성합니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '드와이트 슈루트 (더 오피스) - 규칙을 중시하고 효율적으로 일을 처리하며, 강한 책임감을 가진 모습이 닮았습니다.'
+                    }
+                },
+                ESFJ: {
+                    type: 'ESFJ',
+                    nickname: '집정관',
+                    color: 'from-cyan-600 to-teal-600',
+                    bgColor: 'bg-cyan-50',
+                    borderColor: 'border-cyan-300',
+                    summary: '사교적이고 배려심 깊은 화합의 중심',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '로마, 이탈리아 - 따뜻한 사람들과 풍부한 문화를 경험하며, 맛있는 음식을 함께 나누고 소통할 수 있는 곳입니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '이탈리아 - 가족과 공동체를 중시하는 문화, 따뜻한 인간관계가 ESFJ에게 완벽한 환경을 제공합니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '따뜻하고 배려심 많으며 파트너의 행복을 자신의 행복으로 여깁니다. 전통적인 로맨스를 좋아하고 관계를 소중히 합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '이벤트 플래너, 고객 서비스 매니저, 간호사, 교사 - 사람들과 협력하고 조화로운 환경을 만드는 일에서 빛을 발합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ISFP - 감성적 교류로 깊은 이해를 나눕니다. ISTP - 실용적 관점으로 균형을 제공합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '타인의 평가에 지나치게 민감하고 갈등을 회피합니다. 자신의 의견을 당당히 표현하고, 비판을 성장의 기회로 받아들여야 합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '친구들과 수다를 떨거나 요리를 하며 누군가를 돌보는 활동으로 에너지를 회복합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'WhatsApp - 사람들과 끊임없이 소통하고 연결되며, 관계를 유지하는 데 열정적입니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '모니카 겔러 (프렌즈) - 배려심 많고 사교적이며, 모든 사람을 챙기고 조화를 중시하는 모습이 닮았습니다.'
+                    }
+                },
+                ISTP: {
+                    type: 'ISTP',
+                    nickname: '장인',
+                    color: 'from-yellow-600 to-orange-600',
+                    bgColor: 'bg-yellow-50',
+                    borderColor: 'border-yellow-300',
+                    summary: '실용적이고 독립적인 문제 해결사',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '뉴질랜드 - 번지점프, 스카이다이빙 등 스릴 넘치는 액티비티를 즐기며 자연 속에서 자유를 만끽할 수 있습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '호주 - 자유로운 생활 방식과 야외 활동 문화, 실용적인 접근을 중시하는 환경이 ISTP와 잘 맞습니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '자유로운 관계를 선호하며 행동으로 사랑을 표현합니다. 말은 적지만 실질적인 도움으로 파트너를 지지합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '엔지니어, 조종사, 정비사, 운동선수 - 손으로 직접 만들고 즉각적인 문제를 해결하는 실용적 분야에서 탁월합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ESFJ - 따뜻함으로 ISTP의 차가운 면을 녹입니다. ESTJ - 체계성으로 ISTP의 삶에 구조를 더합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '감정 표현이 서툴고 헌신을 두려워합니다. 감정을 언어로 표현하는 연습과 장기적 계획의 중요성을 인정해야 합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '혼자 무언가를 고치거나 만들며, 육체적 활동이나 모험적인 취미로 에너지를 발산합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'YouTube - 다양한 DIY와 실용적인 정보를 탐색하며, 필요할 때만 나타나는 자유로운 존재입니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '제임스 본드 - 냉정하고 실용적이며, 즉흥적으로 문제를 해결하는 액션 히어로의 모습이 닮았습니다.'
+                    }
+                },
+                ISFP: {
+                    type: 'ISFP',
+                    nickname: '모험가',
+                    color: 'from-amber-600 to-yellow-600',
+                    bgColor: 'bg-amber-50',
+                    borderColor: 'border-amber-300',
+                    summary: '감성적이고 자유로운 예술가 기질',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '발리, 인도네시아 - 예술적 영감과 자유로운 분위기 속에서 창의성을 발산하며, 자연과 하나 되는 경험을 할 수 있습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '포르투갈 - 여유로운 삶의 속도, 예술적 문화, 자연과의 조화가 ISFP의 영혼을 편안하게 합니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '로맨틱하고 감각적이며 순간을 소중히 여깁니다. 작은 제스처로 사랑을 표현하고, 파트너와의 감성적 연결을 중시합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '디자이너, 사진가, 요리사, 수의사 - 감각과 창의성을 활용하며 아름다움을 창조하는 분야에서 행복을 느낍니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ENFJ - 따뜻한 격려로 ISFP의 잠재력을 끌어냅니다. ESFJ - 안정감으로 ISFP에게 편안함을 제공합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '계획성이 부족하고 쉽게 상처받습니다. 장기적 목표를 세우고, 비판을 개인적으로 받아들이지 않는 연습이 필요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '그림 그리기, 음악 듣기 등 예술 활동으로 감정을 표현하거나, 자연 속에서 고요함을 찾습니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'VSCO - 감각적이고 예술적인 비주얼로 순간의 아름다움을 포착하고 표현합니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '찰리 채플린 - 감성적이고 예술적이며, 순간의 아름다움을 소중히 여기는 모습이 닮았습니다.'
+                    }
+                },
+                ESTP: {
+                    type: 'ESTP',
+                    nickname: '사업가',
+                    color: 'from-orange-600 to-red-600',
+                    bgColor: 'bg-orange-50',
+                    borderColor: 'border-orange-300',
+                    summary: '대담하고 에너지 넘치는 행동파',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '라스베이거스, 미국 - 화려하고 역동적인 도시에서 스릴 넘치는 경험과 즉흥적인 모험을 즐길 수 있습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '두바이, UAE - 빠르게 발전하는 역동적인 환경과 럭셔리한 라이프스타일이 ESTP의 야망과 잘 맞습니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '열정적이고 즉흥적이며 파트너와 함께 모험을 즐깁니다. 지루함을 싫어하고 항상 새로운 것을 시도합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '영업 관리자, 기업가, 응급구조사, 트레이더 - 빠른 판단과 즉각적인 행동이 필요한 역동적인 분야에서 탁월합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ISFJ - 안정감으로 ESTP에게 균형을 제공합니다. ISTJ - 체계성으로 ESTP의 즉흥성을 보완합니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '충동적이고 장기적 계획이 부족합니다. 행동하기 전에 잠시 생각하고, 결과를 고려하는 습관을 기르는 것이 중요합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '친구들과 액티비티를 즐기거나 즉흥적인 여행을 떠나며, 물리적 활동으로 에너지를 발산합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Uber - 빠르고 즉각적이며, 언제 어디서든 행동할 준비가 되어 있는 역동적인 존재입니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '조던 벨포트 (더 울프 오브 월스트리트) - 대담하고 카리스마 넘치며, 즉각적인 성과를 추구하는 모습이 닮았습니다.'
+                    }
+                },
+                ESFP: {
+                    type: 'ESFP',
+                    nickname: '연예인',
+                    color: 'from-red-600 to-pink-600',
+                    bgColor: 'bg-red-50',
+                    borderColor: 'border-red-300',
+                    summary: '활기차고 즐거움을 사랑하는 엔터테이너',
+                    travel: {
+                        icon: '✈️',
+                        title: '추천 여행지',
+                        content: '이비자, 스페인 - 파티와 음악이 넘치는 섬에서 사람들과 어울리며 순간순간을 최대한 즐길 수 있습니다.'
+                    },
+                    immigration: {
+                        icon: '🌍',
+                        title: '찰떡 이민 국가',
+                        content: '브라질 - 열정적이고 축제를 사랑하는 문화, 사교적인 분위기가 ESFP의 에너지와 완벽하게 조화를 이룹니다.'
+                    },
+                    love: {
+                        icon: '❤️',
+                        title: '연애 스타일',
+                        content: '열정적이고 로맨틱하며 파트너에게 기쁨을 주는 것을 좋아합니다. 즉흥적인 데이트와 서프라이즈를 자주 선사합니다.'
+                    },
+                    job: {
+                        icon: '💼',
+                        title: '추천 직업',
+                        content: '배우, 이벤트 플래너, 패션 스타일리스트, 여행 가이드 - 사람들을 즐겁게 하고 에너지를 전파하는 분야에서 빛을 발합니다.'
+                    },
+                    compatible: {
+                        icon: '🤝',
+                        title: '잘 맞는 MBTI',
+                        content: 'ISTJ - 안정감과 체계성으로 ESFP에게 균형을 제공합니다. ISFJ - 따뜻한 지지로 ESFP를 든든하게 지켜줍니다.'
+                    },
+                    weakness: {
+                        icon: '⚠️',
+                        title: '단점 및 극복',
+                        content: '주목받고 싶어하고 장기적 계획이 부족합니다. 깊이 있는 대화를 시도하고, 미래를 위한 준비의 중요성을 인식해야 합니다.'
+                    },
+                    stress: {
+                        icon: '☕',
+                        title: '스트레스 해소',
+                        content: '친구들과 파티를 즐기거나 쇼핑, 맛집 탐방 등 즉각적인 즐거움으로 기분을 전환합니다.'
+                    },
+                    app: {
+                        icon: '📱',
+                        title: '스마트폰 앱 의인화',
+                        content: 'Snapchat - 순간을 즐기고 재미있게 공유하며, 항상 현재에 집중하는 즐거운 존재입니다.'
+                    },
+                    character: {
+                        icon: '🎬',
+                        title: '평행세계의 나',
+                        content: '레이첼 그린 (프렌즈) - 사교적이고 패셔너블하며, 주변 사람들에게 즐거움을 주는 모습이 닮았습니다.'
+                    }
+                }
+            };
+
+            const mbtiTypes = Object.keys(mbtiData);
+            const filteredTypes = mbtiTypes.filter(type => 
+                type.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            const trendingHashtags = ['#자기계발', '#힐링여행', '#커리어성장', '#MBTI궁합', '#라이프밸런스', '#찰떡이민국가'];
+
+            const MBTICard = ({ type, data, onClick }) => (
+                <div
+                    onClick={onClick}
+                    className={`bg-gray-900 border-2 border-gray-800 rounded-2xl p-6 cursor-pointer 
+                                transform transition-all duration-300 hover:scale-105 hover:shadow-2xl
+                                hover:shadow-purple-500/30 hover:border-purple-500/50
+                                flex flex-col items-center justify-center gap-3`}
+                >
+                    <div className={`bg-gradient-to-br ${data.color} text-white w-16 h-16 rounded-full 
+                                    flex items-center justify-center text-2xl font-bold shadow-lg shadow-purple-500/30`}>
+                        {type}
+                    </div>
+                    <h3 className="text-lg font-bold text-white">{data.nickname}</h3>
+                    <p className="text-sm text-gray-400 text-center">{data.summary}</p>
+                </div>
+            );
+
+            const DetailSection = ({ icon, title, content }) => (
+                <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="text-3xl">{icon}</span>
+                        <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+                    </div>
+                    <p className="text-gray-700 leading-relaxed">{content}</p>
+                </div>
+            );
+
+            if (selectedMBTI) {
+                const data = mbtiData[selectedMBTI];
+                return (
+                    <div className="min-h-screen bg-black p-6">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="mb-8">
+                                <button
+                                    onClick={() => setSelectedMBTI(null)}
+                                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6"
+                                >
+                                    <ArrowLeft size={24} />
+                                    <span className="font-semibold">뒤로가기</span>
+                                </button>
+                                
+                                <div className={`bg-gradient-to-br ${data.color} rounded-3xl p-8 text-white shadow-2xl`}>
+                                    <div className="flex items-center gap-6">
+                                        <div className="bg-white/20 backdrop-blur-sm w-24 h-24 rounded-full 
+                                                    flex items-center justify-center text-4xl font-bold">
+                                            {selectedMBTI}
+                                        </div>
+                                        <div>
+                                            <h1 className="text-4xl font-bold mb-2">{data.nickname}</h1>
+                                            <p className="text-xl opacity-90">{data.summary}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <DetailSection {...data.travel} />
+                                <DetailSection {...data.immigration} />
+                                <DetailSection {...data.love} />
+                                <DetailSection {...data.job} />
+                                <DetailSection {...data.compatible} />
+                                <DetailSection {...data.weakness} />
+                                <DetailSection {...data.stress} />
+                                <DetailSection {...data.app} />
+                                <DetailSection {...data.character} />
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen bg-black p-6">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 
+                                         bg-clip-text text-transparent mb-4 animate-pulse">
+                                MBTI Insight World
+                            </h1>
+                            <p className="text-gray-400 text-lg">나를 위한 맞춤형 라이프스타일 큐레이션</p>
+                        </div>
+
+                        <div className="mb-8 max-w-md mx-auto">
+                            <div className="relative">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
+                                <input
+                                    type="text"
+                                    placeholder="나의 MBTI를 검색하세요 (예: INFP)"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-4 rounded-full border-2 border-gray-800 
+                                             bg-gray-900 text-white placeholder-gray-500
+                                             focus:border-purple-500 focus:outline-none transition-colors
+                                             shadow-lg shadow-purple-500/10"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                            {filteredTypes.map(type => (
+                                <MBTICard
+                                    key={type}
+                                    type={type}
+                                    data={mbtiData[type]}
+                                    onClick={() => setSelectedMBTI(type)}
+                                />
+                            ))}
+                        </div>
+
+                        {filteredTypes.length === 0 && (
+                            <div className="text-center py-12">
+                                <p className="text-gray-400 text-lg">검색 결과가 없습니다.</p>
+                            </div>
+                        )}
+
+                        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-lg shadow-purple-500/10">
+                            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                                <span className="text-3xl">🔥</span>
+                                오늘의 인기 테마
+                            </h2>
+                            <div className="flex flex-wrap gap-3">
+                                {trendingHashtags.map((tag, index) => (
+                                    <span
+                                        key={index}
+                                        className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 
+                                                 text-white rounded-full font-semibold shadow-md shadow-purple-500/30
+                                                 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50 
+                                                 transition-all cursor-pointer"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MBTIInsightWorld />, document.getElementById('root'));
+    </script>
+</body>
+</html>
